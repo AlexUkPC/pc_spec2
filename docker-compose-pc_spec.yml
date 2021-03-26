@@ -1,0 +1,29 @@
+version: "3" 
+services:
+  web_pc_spec:
+    image: alexrogna/pc_spec_web:prod
+    expose:
+      - 3000
+    env_file:
+      - .env/production/database_pc_spec
+      - .env/production/web_pc_spec
+    environment:
+      - "VIRTUAL_HOST=pc_spec.alexrogna.com"
+    restart: always
+
+  database_pc_spec:
+    image: postgres
+    env_file:
+      - .env/production/database_pc_spec
+    volumes:
+      - db_data_pc_spec:/var/lib/postgresql/data
+    restart: always
+    
+  db-migrator_pc_spec:
+    image: alexrogna/pc_spec_web:prod
+    command: ["./wait-for", "--timeout=300", "database_pc_spec:5432", "--", "bin/rails", "db:create" , "db:migrate"]
+    env_file:
+      - .env/production/database_pc_spec
+      - .env/production/web_pc_spec
+volumes:
+  db_data_pc_spec:

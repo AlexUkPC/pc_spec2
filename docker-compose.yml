@@ -1,0 +1,44 @@
+version: "3"
+services:
+  web_pc_spec:
+    build:
+      context: .
+      args:
+        USER_ID: "${USER_ID:-1000}"
+        GROUP_ID: "${GROUP_ID:-1000}"
+    ports:
+      - "3000:3000"
+    volumes: 
+      - ./pc_spec:/opt/app
+      - gem_cache_pc_spec:/gems
+    env_file: 
+      - .env/development/database_pc_spec
+      - .env/development/web_pc_spec
+    environment: 
+      - WEBPACKER_DEV_SERVER_HOST=webpack_dev_server_pc_spec
+  webpack_dev_server_pc_spec:
+    build:
+      context: .
+      args:
+        USER_ID: "${USER_ID:-1000}"
+        GROUP_ID: "${GROUP_ID:-1000}"
+    command: ./bin/webpack-dev-server
+    ports: 
+      - "3035:3035"
+    volumes: 
+      - ./pc_spec:/opt/app
+      - gem_cache_pc_spec:/gems
+    env_file: 
+      - .env/development/database_pc_spec
+      - .env/development/web_pc_spec
+    environment: 
+      - WEBPACKER_DEV_SERVER_HOST=0.0.0.0
+  database_pc_spec:
+    image: postgres
+    env_file: 
+      - .env/development/database_pc_spec
+    volumes: 
+      - db_data_pc_spec:/var/lib/postgresql/data
+volumes: 
+  db_data_pc_spec:
+  gem_cache_pc_spec:
